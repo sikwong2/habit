@@ -3,6 +3,7 @@
     {
       "name": "Morning Exercise",
       "description": "30 minutes of exercise each morning",
+      "createdDate": 1703462400000,
       "completedDates": [
         1704067200000,
         1704153600000,
@@ -226,6 +227,7 @@
     {
       "name": "Read 20 Pages",
       "description": "Read at least 20 pages of any book",
+      "createdDate": 1703462400000,
       "completedDates": [
         1704067200000,
         1704240000000,
@@ -417,6 +419,7 @@
     {
       "name": "Drink 8 Glasses of Water",
       "description": "Stay hydrated by drinking at least 8 glasses of water daily",
+      "createdDate": 1703548800000,
       "completedDates": [
         1704153600000,
         1704326400000,

@@ -1,4 +1,5 @@
 import HabitCard from './components/HabitCard'
+import CalendarView from './components/CalendarView'
 import habitsData from '../data/habits.json'
 
 interface Habit {
@@ -29,8 +30,8 @@ function App() {
       </div>
 
       {/* Calendar - 2/3 width */}
-      <div className="w-2/3 p-4">
-        <h2 className="text-xl font-semibold mb-4">Calendar</h2>
+      <div className="w-2/3 p-8">
+        <CalendarView />
       </div>
     </div>
   )

@@ -1,7 +1,9 @@
+'use client'
+
 import { useState } from 'react'
-import HabitCard from './components/HabitCard'
-import CalendarView from './components/CalendarView'
-import habitsData from '../data/habits.json'
+import HabitCard from '@/components/HabitCard'
+import CalendarView from '@/components/CalendarView'
+import habitsData from '@/data/habits.json'
 
 interface Habit {
   name: string
@@ -10,7 +12,7 @@ interface Habit {
   completedDates: number[]
 }
 
-function App() {
+export default function Home() {
   const habits: Habit[] = habitsData.habits
   const [currentDate, setCurrentDate] = useState(new Date())
 
@@ -59,5 +61,3 @@ function App() {
     </div>
   )
 }
-
-export default App

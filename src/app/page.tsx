@@ -208,7 +208,7 @@ export default function Home() {
         </div>
 
         {/* Calendar - 2/3 width */}
-        <div className="w-2/3 p-8">
+        <div className="w-2/3 p-8 overflow-y-auto">
           {currentDate && (
             <CalendarView
               habits={habits}

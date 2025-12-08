@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import HabitCard from '@/components/HabitCard'
 import CalendarView from '@/components/CalendarView'
 import habitsData from '@/data/habits.json'
@@ -14,10 +14,18 @@ interface Habit {
 
 export default function Home() {
   const habits: Habit[] = habitsData.habits
-  const [currentDate, setCurrentDate] = useState(new Date())
+  // Initialize with null, then set to current date after mount to avoid hydration issues
+  const [currentDate, setCurrentDate] = useState<Date | null>(null)
+
+  useEffect(() => {
+    // Set the current date only on the client after hydration
+    const now = new Date()
+    setCurrentDate(new Date(now.getFullYear(), now.getMonth(), 1))
+  }, [])
 
   const goToPreviousMonth = () => {
     setCurrentDate(prevDate => {
+      if (!prevDate) return null
       const newDate = new Date(prevDate)
       newDate.setMonth(newDate.getMonth() - 1)
       return newDate
@@ -26,6 +34,7 @@ export default function Home() {
 
   const goToNextMonth = () => {
     setCurrentDate(prevDate => {
+      if (!prevDate) return null
       const newDate = new Date(prevDate)
       newDate.setMonth(newDate.getMonth() + 1)
       return newDate
@@ -51,12 +60,14 @@ export default function Home() {
 
       {/* Calendar - 2/3 width */}
       <div className="w-2/3 p-8">
-        <CalendarView
-          habits={habits}
-          currentDate={currentDate}
-          onPreviousMonth={goToPreviousMonth}
-          onNextMonth={goToNextMonth}
-        />
+        {currentDate && (
+          <CalendarView
+            habits={habits}
+            currentDate={currentDate}
+            onPreviousMonth={goToPreviousMonth}
+            onNextMonth={goToNextMonth}
+          />
+        )}
       </div>
     </div>
   )

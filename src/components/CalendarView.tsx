@@ -1,3 +1,5 @@
+'use client'
+
 interface Habit {
   name: string
   description: string
@@ -6,13 +8,13 @@ interface Habit {
 }
 
 interface CalendarViewProps {
-  currentDate?: Date
+  currentDate: Date
   habits: Habit[]
   onPreviousMonth: () => void
   onNextMonth: () => void
 }
 
-function CalendarView({ currentDate = new Date(), habits, onPreviousMonth, onNextMonth }: CalendarViewProps) {
+function CalendarView({ currentDate, habits, onPreviousMonth, onNextMonth }: CalendarViewProps) {
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
 

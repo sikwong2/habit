@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { supabaseAdmin } from '@/lib/supabase'
@@ -46,8 +47,17 @@ export async function POST(request: Request) {
       )
     }
 
+    // Set cookie with public_id
+    const cookieStore = await cookies()
+    cookieStore.set('userId', user.public_id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    })
+
     return NextResponse.json(
-      { success: true, message: 'Login successful', userId: user.public_id },
+      { success: true, message: 'Login successful' },
       { status: 200 }
     )
   } catch (error) {

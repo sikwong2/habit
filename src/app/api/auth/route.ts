@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { supabaseAdmin } from '@/lib/supabase'
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // Insert user into Supabase database using admin client (bypasses RLS)
-    const { error } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('users')
       .insert([
         {
@@ -37,14 +38,25 @@ export async function POST(request: Request) {
           hashed_password: hashedPassword,
         },
       ])
+      .select('public_id')
+      .single()
 
-    if (error) {
+    if (error || !data) {
       console.error('Supabase error:', error)
       return NextResponse.json(
-        { success: false, error: error.message },
+        { success: false, error: error?.message || 'Failed to create user' },
         { status: 500 }
       )
     }
+
+    // Set cookie with public_id
+    const cookieStore = await cookies()
+    cookieStore.set('userId', data.public_id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    })
 
     return NextResponse.json(
       { success: true, message: 'User created successfully' },

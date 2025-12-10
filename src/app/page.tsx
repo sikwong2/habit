@@ -207,7 +207,7 @@ export default function Home() {
                     <Plus className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                <PopoverContent className="w-80" side="bottom" align="center" sideOffset={10}>
                   <div className="grid gap-4">
                     <div className="space-y-2">
                       <h4 className="font-medium leading-none">Create New Habit</h4>

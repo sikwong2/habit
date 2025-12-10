@@ -177,64 +177,66 @@ export default function Home() {
         <div className="w-1/3 border-r border-border p-4 overflow-y-auto bg-muted/30 relative z-0">
           <div className="flex items-center justify-center gap-2 mb-4">
             <h2 className="text-xl font-semibold">Habits</h2>
-            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 relative z-10">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
-                <div className="grid gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium leading-none">Create New Habit</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Add a new habit to track.
-                    </p>
+            {isAuthenticated && (
+              <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 relative z-10">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" side="right" align="start" sideOffset={10}>
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium leading-none">Create New Habit</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Add a new habit to track.
+                      </p>
+                    </div>
+                    <div className="grid gap-2">
+                      <div className="grid gap-1">
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          placeholder="e.g., Morning Exercise"
+                          value={newHabitName}
+                          onChange={(e) => setNewHabitName(e.target.value)}
+                        />
+                      </div>
+                      <div className="grid gap-1">
+                        <Label htmlFor="description">Description</Label>
+                        <Input
+                          id="description"
+                          placeholder="e.g., 30 minutes of exercise each morning"
+                          value={newHabitDescription}
+                          onChange={(e) => setNewHabitDescription(e.target.value)}
+                        />
+                      </div>
+                      <div className="grid gap-1">
+                        <Label htmlFor="color">Color</Label>
+                        <Select value={newHabitColor} onValueChange={setNewHabitColor}>
+                          <SelectTrigger id="color">
+                            <SelectValue placeholder="Select a color" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="red">Red</SelectItem>
+                            <SelectItem value="blue">Blue</SelectItem>
+                            <SelectItem value="green">Green</SelectItem>
+                            <SelectItem value="yellow">Yellow</SelectItem>
+                            <SelectItem value="purple">Purple</SelectItem>
+                            <SelectItem value="pink">Pink</SelectItem>
+                            <SelectItem value="orange">Orange</SelectItem>
+                            <SelectItem value="cyan">Cyan</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button onClick={handleCreateHabit} className="mt-2">
+                        Create Habit
+                      </Button>
+                    </div>
                   </div>
-                  <div className="grid gap-2">
-                    <div className="grid gap-1">
-                      <Label htmlFor="name">Name</Label>
-                      <Input
-                        id="name"
-                        placeholder="e.g., Morning Exercise"
-                        value={newHabitName}
-                        onChange={(e) => setNewHabitName(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid gap-1">
-                      <Label htmlFor="description">Description</Label>
-                      <Input
-                        id="description"
-                        placeholder="e.g., 30 minutes of exercise each morning"
-                        value={newHabitDescription}
-                        onChange={(e) => setNewHabitDescription(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid gap-1">
-                      <Label htmlFor="color">Color</Label>
-                      <Select value={newHabitColor} onValueChange={setNewHabitColor}>
-                        <SelectTrigger id="color">
-                          <SelectValue placeholder="Select a color" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="red">Red</SelectItem>
-                          <SelectItem value="blue">Blue</SelectItem>
-                          <SelectItem value="green">Green</SelectItem>
-                          <SelectItem value="yellow">Yellow</SelectItem>
-                          <SelectItem value="purple">Purple</SelectItem>
-                          <SelectItem value="pink">Pink</SelectItem>
-                          <SelectItem value="orange">Orange</SelectItem>
-                          <SelectItem value="cyan">Cyan</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button onClick={handleCreateHabit} className="mt-2">
-                      Create Habit
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
           <div className="max-w-md mx-auto relative z-0">
             {habits.map((habit, index) => (
@@ -245,7 +247,7 @@ export default function Home() {
                 color={habit.color}
                 completedDatesCount={habit.completedDates.length}
                 onClick={() => handleHabitClick(habit.name)}
-                onDelete={() => handleDeleteHabit(habit.name)}
+                onDelete={isAuthenticated ? () => handleDeleteHabit(habit.name) : undefined}
               />
             ))}
           </div>

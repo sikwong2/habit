@@ -48,8 +48,15 @@ export default function Home() {
       if (!data.authenticated) {
         setHabits(habitsData.habits)
       } else {
-        // If authenticated, show nothing for now
-        setHabits([])
+        // If authenticated, fetch habits from database
+        const habitsResponse = await fetch('/api/habits')
+        const habitsData = await habitsResponse.json()
+
+        if (habitsData.success && habitsData.habits) {
+          setHabits(habitsData.habits)
+        } else {
+          setHabits([])
+        }
       }
     } catch (error) {
       console.error('Error checking auth status:', error)

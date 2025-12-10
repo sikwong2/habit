@@ -288,24 +288,79 @@ export async function DELETE(request: Request) {
   try {
     const { habitName } = await request.json()
 
-    // Read the current habits.json file
-    const filePath = path.join(process.cwd(), 'src/data/habits.json')
-    const fileContents = await fs.readFile(filePath, 'utf8')
-    const data = JSON.parse(fileContents)
+    // Check if user is authenticated
+    const cookieStore = await cookies()
+    const userId = cookieStore.get('userId')?.value
 
-    // Find the habit index by name
-    const habitIndex = data.habits.findIndex((h: any) => h.name === habitName)
-    if (habitIndex === -1) {
-      return NextResponse.json({ success: false, error: 'Habit not found' }, { status: 404 })
+    if (userId) {
+      // User is authenticated - delete from Supabase database
+      // First, find the habit by name and user_id
+      const { data: habit, error: habitError } = await supabaseAdmin
+        .from('habits')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('name', habitName)
+        .single()
+
+      if (habitError || !habit) {
+        console.error('Habit not found:', habitError)
+        return NextResponse.json(
+          { success: false, error: 'Habit not found' },
+          { status: 404 }
+        )
+      }
+
+      const habitId = habit.id
+
+      // Delete all completions for this habit
+      const { error: completionsError } = await supabaseAdmin
+        .from('habit_completions')
+        .delete()
+        .eq('habit_id', habitId)
+
+      if (completionsError) {
+        console.error('Error deleting completions:', completionsError)
+        return NextResponse.json(
+          { success: false, error: 'Failed to delete habit completions' },
+          { status: 500 }
+        )
+      }
+
+      // Delete the habit itself
+      const { error: deleteError } = await supabaseAdmin
+        .from('habits')
+        .delete()
+        .eq('id', habitId)
+
+      if (deleteError) {
+        console.error('Error deleting habit:', deleteError)
+        return NextResponse.json(
+          { success: false, error: 'Failed to delete habit' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true }, { status: 200 })
+    } else {
+      // User is not authenticated - use JSON file (mock data)
+      const filePath = path.join(process.cwd(), 'src/data/habits.json')
+      const fileContents = await fs.readFile(filePath, 'utf8')
+      const data = JSON.parse(fileContents)
+
+      // Find the habit index by name
+      const habitIndex = data.habits.findIndex((h: any) => h.name === habitName)
+      if (habitIndex === -1) {
+        return NextResponse.json({ success: false, error: 'Habit not found' }, { status: 404 })
+      }
+
+      // Remove the habit
+      data.habits.splice(habitIndex, 1)
+
+      // Write back to the file
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2))
+
+      return NextResponse.json({ success: true }, { status: 200 })
     }
-
-    // Remove the habit
-    data.habits.splice(habitIndex, 1)
-
-    // Write back to the file
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2))
-
-    return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
     console.error('Error deleting habit:', error)
     return NextResponse.json({ success: false, error: 'Failed to delete habit' }, { status: 500 })
